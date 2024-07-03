@@ -1,0 +1,64 @@
+[tool.poetry]
+name = "ascent-openmvg"
+version = "0.1.0"
+description = ""
+authors = ["Tarmily Wen"]
+readme = "README.md"
+
+[tool.poe.tasks]
+# This should only be called if you know you are using nvidia gpus
+pytorch = "python -m pip install torch==2.3.0+cu121 torchvision==0.18.0+cu121 -f https://download.pytorch.org/whl/torch_stable.html"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+torch = "^2.3.0"
+torchvision = "^0.18.0"
+numpy = "^2.0.0"
+kornia = "^0.7.3"
+pyvips = "^2.2.3"
+tqdm = "^4.66.4"
+
+[tool.poetry.group.dev.dependencies]
+black = {extras = ["jupyter"], version = "^22.12.0"}
+flake8 = "^5.0.4"
+flake8-bandit = "^4.1.1"
+flake8-bugbear = "^22.12.6"
+flake8-docstrings = "^1.7.0"
+flake8-rst-docstrings = "^0.2.7"
+isort = "^5.13.2"
+pygments = "^2.18.0"
+pyright = "^1.1.367"
+pre-commit = "^2.21.0"
+nox = "^2022.11.21"
+nox-poetry = "^1.0.3"
+poethepoet = "^0.18.0"
+pep8-naming = "^0.13.3"
+ipykernel = "^6.29.4"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+include_trailing_comma=true
+
+[tool.pyright]
+include = ["."]
+
+typeCheckingMode = "basic"
+useLibraryCodeForTypes = true
+pythonPlatform = "Linux"
+pythonVersion = "3.11"
+verboseOutput = true
+
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportGeneralTypeIssues = "warning"
+reportPrivateImportUsage = "none"
+reportUnboundVariable = "warning"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

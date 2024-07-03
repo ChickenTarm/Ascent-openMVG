@@ -1,0 +1,20 @@
+networks:
+  ml-network:
+    name: ml-network
+    external: true
+services:
+  ml:
+    build:
+      dockerfile: Dockerfile.gpu
+      context: .
+      args:
+        PYTHON_VERSION: "3.11"
+      tags:
+        - ascent-openmvg
+    shm_size: 64g
+    volumes:
+      - ~/Ascent-openMVG:/home/Ascent-openMVG
+    command: tail -F anything
+    networks:
+      - ml-network
+    privileged: true
