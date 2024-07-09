@@ -38,3 +38,13 @@ $ python kornia_demo.py -i "...\ImageDataset_SceauxCastle\images\sfm\matches\sfm
 ```
 
 Afterwards, run openMVG_main_GeometricFilter and openMVG_main_SfM as normal.
+
+
+openMVG_main_SfMInit_ImageListing -i /home/Ascent-openMVG/SfM_data/images -o /home/Ascent-openMVG/SfM_data -k "15294.117647058822;0;540.0;0;15294.117647058822;960.0;0;0;1"
+openMVG_main_ComputeFeatures -i /home/Ascent-openMVG/SfM_data/sfm_data.json -o /home/Ascent-openMVG/SfM_data/matches
+openMVG_main_ComputeVLAD -i /home/Ascent-openMVG/SfM_data/sfm_data.json -o /home/Ascent-openMVG/SfM_data/matches -p /home/Ascent-openMVG/SfM_data/matches/vlad_pairs.txt
+openMVG_main_ComputeMatches -i /home/Ascent-openMVG/SfM_data/sfm_data.json -p /home/Ascent-openMVG/SfM_data/matches/vlad_pairs.txt -o /home/Ascent-openMVG/SfM_data/matches/matches.putative.bin
+openMVG_main_GeometricFilter -i /home/Ascent-openMVG/SfM_data/sfm_data.json -m /home/Ascent-openMVG/SfM_data/matches/matches.putative.bin -p /home/Ascent-openMVG/SfM_data/matches/vlad_pairs.txt -o /home/Ascent-openMVG/SfM_data/matches/matches.f.bin -g f
+openMVG_main_SfM -i /home/Ascent-openMVG/SfM_data/sfm_data.json -m /home/Ascent-openMVG/SfM_data/matches -o /home/Ascent-openMVG/SfM_data/sfm_results -s STELLAR -M /home/Ascent-openMVG/SfM_data/matches/matches.f.bin
+openMVG_main_ComputeSfM_DataColor -i /home/Ascent-openMVG/SfM_data/sfm_results/sfm_data.bin -o /home/Ascent-openMVG/SfM_data/sfm_results/colorized.ply
+openMVG_main_openMVG2openMVS -i /home/Ascent-openMVG/SfM_data/sfm_results/sfm_data.bin -o /home/Ascent-openMVG/SfM_data/mvs/scene.mvs

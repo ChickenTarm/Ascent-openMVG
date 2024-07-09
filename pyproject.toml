@@ -17,6 +17,7 @@ numpy = "^2.0.0"
 kornia = "^0.7.3"
 pyvips = "^2.2.3"
 tqdm = "^4.66.4"
+opencv-python-headless = "^4.10.0.84"
 
 [tool.poetry.group.dev.dependencies]
 black = {extras = ["jupyter"], version = "^22.12.0"}

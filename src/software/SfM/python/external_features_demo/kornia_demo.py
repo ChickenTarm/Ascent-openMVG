@@ -4,7 +4,7 @@ import json
 import kornia as K
 import numpy as np
 import os
-from pyvips import Image
+import cv2
 import torch
 import torchvision.transforms as transforms
 import threading
@@ -56,25 +56,26 @@ def saveMatchesOpenMVG(matches):
 def featureExtraction():
   print('Extracting DISK features...')
   for image_path in tqdm(image_paths):
-    img = Image.new_from_file(image_path, access='sequential')
+    img = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
+    height, width, _ = img.shape
     basename = os.path.splitext(os.path.basename(image_path))[0]
 
-    if img.width % 2 != 0 or img.height % 2 != 0:
-      img = img.crop(0, 0, img.width if img.width % 2 == 0 else img.width - 1, img.height if img.height % 2 == 0 else img.height - 1)
+    if width % 2 != 0 or height % 2 != 0:
+      img = img[0, 0, width if width % 2 == 0 else width - 1, height if height % 2 == 0 else height - 1]
 
     max_res = args.max_resolution
-    img_max, img_ratio = max(img.width, img.height), img.width / img.height
+    img_max, img_ratio = max(width, height), width / height
 
     ratio = 0
     while not ratio:
       scale = max_res / img_max
-      scaled_width, scaled_height = round(img.width * scale), round(img.height * scale)
+      scaled_width, scaled_height = round(width * scale), round(height * scale)
       if img_ratio == scaled_width / scaled_height:
         ratio = 1
       else:
         max_res -= 1
 
-    img = transforms.ToTensor()(img.resize(scale, kernel='linear').numpy())[None, ...].to(device)
+    img = transforms.ToTensor()(cv2.resize(img, (scaled_width, scaled_height), interpolation=cv2.INTER_LINEAR))[None, ...].to(device)
 
     features = disk(img, n=args.max_features, window_size=args.window_size, score_threshold=args.score_threshold, pad_if_not_divisible=True)[0].to('cpu')
     keypoints = torch.div(features.keypoints, scale)
