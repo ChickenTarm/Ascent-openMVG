@@ -16,25 +16,11 @@ RUN apt -y update; apt -y upgrade; \
 ARG PYTHON_VERSION
 
 # Get dependencies
-RUN apt update; apt install -y tzdata; \
-    apt install -y \
-    cmake \
-    build-essential \
-    graphviz \
-    git \
-    coinor-libclp-dev \
-    libceres-dev \
-    libflann-dev \
-    libjpeg-dev \
-    liblemon-dev \
-    libpng-dev \
-    libtiff-dev \
-    wget \
+RUN apt update; apt install -y wget \
     $(echo "python$PYTHON_VERSION") \
     $(echo "python$PYTHON_VERSION-dev") \
     $(echo "python$PYTHON_VERSION-distutils") \
-    python-is-python3 \
-    ; apt -y autoremove; apt -y clean
+    python-is-python3
 
 RUN wget https://bootstrap.pypa.io/get-pip.py; \
     $(echo "python$PYTHON_VERSION") get-pip.py; \
@@ -45,6 +31,20 @@ RUN wget https://bootstrap.pypa.io/get-pip.py; \
 RUN pip install poetry; \
     poetry config installer.max-workers 10; \
     poetry self add poetry-plugin-up
+
+RUN apt update; apt install -y tzdata; \
+    apt install -y \
+    cmake \
+    build-essential \
+    graphviz \
+    git \
+    libceres-dev \
+    coinor-libclp-dev \
+    libflann-dev \
+    libjpeg-dev \
+    liblemon-dev \
+    libpng-dev \
+    libtiff-dev; apt -y autoremove; apt -y clean
 
 # Clone the openvMVG repo
 ADD . /opt/openMVG
@@ -65,6 +65,14 @@ RUN mkdir /opt/openMVG_Build; \
     make -j$(($(nproc) - 2));
 
 RUN cd /opt/openMVG_Build && make test && make install;
+
+# openMVS dependencies
+RUN apt install -y libopencv-dev libcgal-dev libboost-all-dev
+RUN git clone https://gitlab.com/libeigen/eigen.git; cd eigen; mkdir build; cd build; cmake ..; make -j$(($(nproc) - 2)); make install
+RUN cd /root; git clone https://github.com/cnr-isti-vclab/vcglib.git
+RUN cd /root; git clone --recurse-submodules https://github.com/cdcseacave/openMVS.git
+RUN cd /root/openMVS; mkdir make; cd make; cmake .. -DOpenMVS_USE_CUDA=OFF -DVCG_ROOT=/root/vcglib; cmake --build . -j$(($(nproc) - 2)); cmake --install .
+ENV PATH=$PATH:/root/openMVS/make/bin
 
 RUN mkdir -p /home/Ascent-openMVG
 COPY poetry.lock pyproject.toml /home/Ascent-openMVG/
